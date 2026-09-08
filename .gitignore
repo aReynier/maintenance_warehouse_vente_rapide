@@ -1,0 +1,19 @@
+
+
+# dbt
+target/
+dbt_packages/
+logs/
+.dbt/
+
+# Python
+__pycache__/
+*.pyc
+.env
+
+# Backup
+*.dump
+
+# OS
+.DS_Store
+Thumbs.db
