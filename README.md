@@ -156,6 +156,6 @@ Ouvrez ensuite http://localhost:8080 pour accéder au lineage graph (icône en b
 
 ## Restauration depuis un backup
 
-```bash
-pg_restore -d datawarehouse_e6 fichier.dump
-```
+Suivre la procédure suivante:
+[politique de sauvegarde](./docs/politique_sauvegarde.md)
+S'y trouve la procédure pour un backup complet
