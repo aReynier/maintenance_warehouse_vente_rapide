@@ -1,6 +1,6 @@
 # Politique de sauvegarde de la base de données Postgres
 
-## 1 Objectifs de continuité (RPO/RTO)
+## Objectifs de continuité (RPO/RTO)
 
 **RPO (PDMA - Perte de Données Maximale Admissible) : 24 heures**
 
@@ -12,11 +12,11 @@
 
 ## Back up complet
 
-Pour effectuer un backup complet:
+Le backup complet sert à sauvegarder et restaurer l'intégralité des données et de la structure du Data Warehouse.
 
-### Lancement
+### Lancement périodique
 
-Editer la table cron:
+Pour paramétrer la tâche cron pour le backup complet, éditer la table cron:
 
 ```bash
 crontab -e
@@ -40,9 +40,9 @@ Pour vérifier que cette tâche cron est bien présente, si vous êtes sous lnux
 crontab -l
 ```
 
-### Test
+### Lancement manuel
 
-Pour tester, ou au besoin de lancement manuel du backup complet, lancer le script backup_full.sh
+Pour des tests, si besoin de lancement manuel du backup complet, lancer le script backup_full.sh
 
 ```
 ./scripts/backup_full.sh
@@ -96,3 +96,46 @@ Le script est prévu pour s'arrêter au moindre fail et des logs sont prévus po
 |chmod: changing permissions of '/var/backups/postgres': Operation not permitted|sudo chown -R $USER:$USER /var/backups/postgres|
 
 ---
+
+## Back up partiel
+
+Le backup partiel est une opération manuelle à la demande. Il permet de sauvegarder précisemment un schéma ou une table spécifique.
+
+### Lancement manuel
+
+Pour tester, ou au besoin de lancement manuel du backup complet, lancer le script backup_partial.sh
+
+```
+./scripts/backup_partial.sh paramètre1 paramètre2
+```
+
+Ce script prend deux paramètres:
+
+- paramètre1 -> -t | -n | table | schema
+- paramètre2 -> nom-objet
+
+Ce script sert à extraire des données de la base pour les enregistrer dans un fichier sur le disque.
+
+### Procédure de restauration partielle / ciblée
+
+Pour restaurer uniquement le schéma ou la table sauvegardée (avec écrasement/remplacement de l'existant) :
+
+```Bash
+pg_restore -h $POSTGRES_HOST -p $POSTGRES_PORT -U${POSTGRES_ADMIN:-postgres} \
+           --clean --if-exists \
+           -d $POSTGRES_DB \
+           /var/backups/postgres/datawarehouse_e6_schema_gold_YYYYMMDD_HHMMSS.dump
+```
+
+### Guide de résolution d'erreurs
+
+Tout comme pour le backup complet,le script de backup partiel est prévu pour s'arrêter au moindre fail et des logs sont prévus pour les différents cas:
+| phrase | correctif possible |
+|- |- |
+|"File .env not found" | Charger le fichier .env ou le déplacer à la racine du projet à partir du modèle .env.example. |
+|"pg_dump exited with error" | Corriger les paramètres de connexion (POSTGRES_HOST, POSTGRES_ADMIN, POSTGRES_SUPERUSER) dans le .env. |
+|"Backup file is empty or missing" | Vérifier que le dossier /var/backups/postgres a bien été créé, dispose des bons droits (chmod 700) et que le disque n'est pas saturé. |
+|"pg_restore integrity check failed" | Vérifier que la commande pg_dump a bien abouti et que le fichier se trouve bien dans le dossier attendu sous le nom attendu. |
+|chmod: changing permissions of '/var/backups/postgres': Operation not permitted|sudo chown -R $USER:$USER /var/backups/postgres|
+|Usage: ./... <schema|-n|table|-t> <nom_du_composant> | Rajouter les paramètres requis|
+|Type invalide... | Choisir un nom de type valabe, c'est à dire -t ou -n ou table ou schema |

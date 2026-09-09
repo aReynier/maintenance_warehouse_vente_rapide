@@ -156,6 +156,9 @@ Ouvrez ensuite http://localhost:8080 pour accéder au lineage graph (icône en b
 
 ## Restauration depuis un backup
 
-Suivre la procédure suivante:
+Se référer au guide détaillé :
 [politique de sauvegarde](./docs/politique_sauvegarde.md)
-S'y trouve la procédure pour un backup complet
+Vous y trouverez :
+
+- La procédure de restauration pour un backup complet (DRP)
+- La procédure de sauvegarde et restauration partielle (schéma / table)
