@@ -64,9 +64,30 @@ Possibilité de lancer Postgres avec l'admin de la façon suivante:
 psql -h ${POSTGRES_HOST} -p ${POSTGRES_PORT} -U ${POSTGRES_ADMIN} -d ${POSTGRES_DB}
 ```
 
-### 3. Configurer le profil dbt
+### 3. (recommandé) Créer l'environnement virtuel du dépôt
 
-Éditez le fichier `~/.dbt/profiles.yml` et ajoutez :
+Proposition avec venv
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### 4. Installer les librairies du projet
+
+Installer les librairies listées dans le requirements
+
+```bash
+pip install -r requirements.txt
+```
+
+Ce requirement contient comme librairies principales:
+
+- dbt-postgres
+
+### 5. Configurer le profil dbt
+
+Créer le fichier `~/.dbt/profiles.yml` à la racine de sa propre machine et ajouter :
 
 ```yaml
 datawarehouse_e6:
@@ -74,22 +95,22 @@ datawarehouse_e6:
   outputs:
     dev:
       type: postgres
-      host: localhost
-      port: ${POSTGRES_PORT}
-      user: ${POSTGRES_ADMIN}
-      password: ${POSTGRES_PASSWORD}
-      dbname: ${POSTGRES_DB}
+      host: "{{ env_var('POSTGRES_HOST', 'localhost') }}"
+      port: "{{ env_var('POSTGRES_PORT', '5432') | int }}"
+      user: "{{ env_var('POSTGRES_ADMIN') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD') }}"
+      dbname: "{{ env_var('POSTGRES_DB') }}"
       schema: public
       threads: 4
 ```
 
-### 4. Vérifier la connexion
+### 6. Vérifier la connexion
 
 ```bash
 dbt debug
 ```
 
-### 5. Lancer l'entrepôt
+### 7. Lancer l'entrepôt
 
 ```bash
 dbt seed        # charge les 5 tables brutes
@@ -100,6 +121,8 @@ dbt test        # lance les 66 tests
 
 ## Structure du projet
 
+docs/
+methodologie_gestion_de_projet.md
 seeds/  
 raw_clients.csv  
 raw_produits.csv  
@@ -112,6 +135,8 @@ dimensions/ ← dim_client, dim_produit, dim_date, dim_canal, dim_statut_command
 facts/ ← fact_commandes, fact_visites  
 snapshots/  
 scd_client.sql ← SCD type 2 sur dim_client (ville, code_postal, segment)
+CONTRIBUTING.md
+README.md
 
 ## Utilisateurs PostgreSQL
 
