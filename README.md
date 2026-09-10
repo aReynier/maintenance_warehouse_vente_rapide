@@ -64,6 +64,40 @@ Possibilité de lancer Postgres avec l'admin de la façon suivante:
 psql -h ${POSTGRES_HOST} -p ${POSTGRES_PORT} -U ${POSTGRES_ADMIN} -d ${POSTGRES_DB}
 ```
 
+### 3. Mise en place des paramètres de log Postgres
+
+Pour plus de détails, consulter la page de doumentation dédiée au système de logs:
+[Journalisation et monitoring](./docs/journalisation_monitoring.md#1-journalisation-postgresql.md)
+
+Exécuter le script de configuration :
+
+```bash
+psql -U ${POSTGRES_SUPERUSER} -d ${POSTGRES_DB} -f scripts/setup_postgres_logging.sql
+```
+
+Redémarrer postgres:
+
+```bash
+sudo systemctl restart postgresql
+```
+
+Pour tester si les logs correspondent bien à l'attendu:
+
+```bash
+psql -h ${POSTGRES_HOST} -p ${POSTGRES_PORT} -U ${POSTGRES_SUPERUSER} -d ${POSTGRES_DB} -c "
+SELECT name, setting, unit, context
+FROM pg_settings
+WHERE name IN (
+    'logging_collector',
+    'log_directory',
+    'log_filename',
+    'log_min_duration_statement',
+    'log_statement',
+    'log_temp_files',
+    'log_lock_waits'
+);"
+```
+
 ### 3. (recommandé) Créer l'environnement virtuel du dépôt
 
 Proposition avec venv
