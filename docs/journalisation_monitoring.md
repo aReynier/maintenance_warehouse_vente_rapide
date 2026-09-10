@@ -63,3 +63,47 @@ WHERE name IN (
     'log_lock_waits'
 );"
 ```
+
+## 2. Journalisation dbt
+
+dbt assure la traçabilité et l'observabilité des logs.
+
+### Configuration globale des logs
+
+La politique de journalisation dbt est fixée au niveau de la racine du projet via la section `flags` du fichier `dbt_project.yml`:
+
+- **log_format: default** : Format texte basique
+- **log_level: info** : Sévérité minimale capturée dès le niveau info
+
+### Fichiers de logs et artefacts
+
+Chaque exécution dbt génère deux fichiers :
+
+- `logs/dbt.log` : Fichier journal textuel retraçant l'ensemble des commandes exécutées, l'horodatage au millième de seconde, le PID de session, les requêtes SQL compilées soumises à PostgreSQL, ainsi que les traces d'erreurs complètes (stack traces) en cas d'échec.
+- `target/run_results.json` : Artefact structuré (JSON) généré automatiquement à la fin de chaque commande (dbt run, dbt test, dbt build). Il contient l'état d'exécution de chaque modèle (success, error, skipped), le temps de traitement exact en secondes ainsi que le nombre de lignes modifiées.
+
+### Recommandations pour les développeurs et l'exploitation
+
+Bien que le projet définisse un comportement par défaut, il est recommandé d'adapter l'exécution selon le contexte d'utilisation :
+
+- En cas d'erreur complexe, élever temporairement le niveau de log à debug pour capturer l'intégralité du contexte :
+
+```bash
+dbt --log-level debug run --select nom_du_modele
+```
+
+- Dans le cadre d'une utilisation future en CI/CD, forcer la sortie JSON structurée :
+
+```bash
+dbt --log-format json run
+```
+
+Astuces
+
+- Inspection rapide des 20 dernières lignes erreurs dans le journal dbt
+
+```bash
+grep -i "error" logs/dbt.log | tail -n 20
+```
+
+**Note**: dans un cas futur de mise en production, prévoir l'arrêt immédiat de la pipeline à la moindre erreur
