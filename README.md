@@ -67,7 +67,7 @@ psql -h ${POSTGRES_HOST} -p ${POSTGRES_PORT} -U ${POSTGRES_ADMIN} -d ${POSTGRES_
 ### 3. Mise en place des paramètres de log Postgres
 
 Pour plus de détails, consulter la page de doumentation dédiée au système de logs:
-[Journalisation et monitoring](./docs/journalisation_monitoring.md#1-journalisation-postgresql.md)
+[Journalisation et monitoring pour Postgres](./docs/journalisation_monitoring.md#1-journalisation-postgresql.md)
 
 Exécuter le script de configuration :
 
@@ -153,10 +153,29 @@ dbt snapshot    # initialise le SCD type 2
 dbt test        # lance les 66 tests
 ```
 
+### 8. Développement quotidien
+
+Une fois l'initialisation faite, plus besoin de lancer toutes les commandes ci dessous, seul un simple run suffit:
+
+```bash
+dbt run
+```
+
+En cas de besoin d'execution ciblée:
+
+```bash
+dbt run --select nom_modele
+```
+
+En cas de bug ou de lancement dans un cadre spécifique (ex. CI/CD), se référer à la partie dbt du guide de jouranlisation et monitoring:
+[Journalisation et monitoring pour dbt](./docs/journalisation_monitoring.md#2-journalisation-dbt)```
+
 ## Structure du projet
 
 docs/
 methodologie_gestion_de_projet.md
+politique_sauvegarde.md
+journalisation_monitoring.md
 seeds/  
 raw_clients.csv  
 raw_produits.csv  
