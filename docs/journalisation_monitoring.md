@@ -2,6 +2,24 @@
 
 Ce document décrit la stratégie de journalisation des événements, de détection des anomalies de performance et d'audit de sécurité pour l'entrepôt de données.
 
+## Introduction & Principes Généraux
+
+La journalisation (_logging_) et le monitoring constituent le socle d'observabilité d'un Data Warehouse. Dans ce projet, la stratégie repose sur la complémentarité de deux niveaux de logs :
+
+- **Logs Infrastructure (PostgreSQL)** : Capturent l'activité du moteur de base de données.
+- **Logs Applicatifs / Orchestration (dbt)** : Capturent l'exécution de la logique métier.
+
+### Niveaux de sévérité utilisés
+
+| Niveau        | Usage dans le projet                                                                                            |
+| :------------ | :-------------------------------------------------------------------------------------------------------------- |
+| **`DEBUG`**   | Informations très détaillées pour le développement local (requêtes SQL brutes compilées).                       |
+| **`INFO`**    | (**Niveau paramétré par défaut**) Retrace le déroulement nominal des opérations (ex: début/fin d'un `dbt run`). |
+| **`WARNING`** | Avertissements, ne bloquent pas l'exécution (ex: critère de sélection sans correspondance).                     |
+| **`ERROR`**   | Échec d'un modèle, d'un test ou requête SQL invalide nécessitant une intervention.                              |
+
+_remarque:_ Lorsqu'un niveau de log particulier est paramétré, les logs de niveau inférieurs n'apparaissent pas
+
 ---
 
 ## 1. Journalisation PostgreSQL
@@ -11,8 +29,6 @@ La configuration des logs PostgreSQL est gérée de manière déclarative via le
 ### Emplacement des fichiers de logs
 
 Les fichiers sont stockés dans le répertoire `log/` du dossier de données PostgreSQL (exemple: `/var/lib/postgresql/16/main`). Chaque fichier est nommé avec un horodatage unique sous la forme `postgresql-YYYY-MM-DD_HHMMSS.log`.
-
----
 
 ### Référentiel des paramètres configurés
 
@@ -30,8 +46,6 @@ Les fichiers sont stockés dans le répertoire `log/` du dossier de données Pos
 | **`log_temp_files`**                         | `'0'`                              | **Observabilité mémoire.** Enregistre la création de fichiers temporaires sur disque lorsqu'une requête dépasse le `work_mem` alloué.                                |
 | **`log_connections` / `log_disconnections`** | `'on'`                             | **Audit d'accès & RGPD.** Consigne chaque ouverture et fermeture de session utilisateur pour la traçabilité des accès.                                               |
 | **`log_rotation_age` / `log_rotation_size`** | `'1d'` / `'10MB'`                  | **Gestion de l'espace disque.** Force la création d'un nouveau fichier toutes les 24 heures ou dès que la taille atteint 10 Mo.                                      |
-
----
 
 ## Procédure d'application et de rechargement
 
@@ -63,6 +77,8 @@ WHERE name IN (
     'log_lock_waits'
 );"
 ```
+
+---
 
 ## 2. Journalisation dbt
 
