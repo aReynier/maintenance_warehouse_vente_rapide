@@ -230,11 +230,11 @@ README.md
 
 ## Utilisateurs PostgreSQL
 
-| Utilisateur   | Droits                           | Usage                   |
-| ------------- | -------------------------------- | ----------------------- |
-| postgres      | Superadmin système               | Urgence uniquement      |
-| grafanareader | lcture de la table grafanareader | tableau de bord grafana |
-| dbt_admin     | admin + Lecture/écriture         | Admin + Pipeline dbt    |
+| Utilisateur    | Droits                           | Usage                   |
+| -------------- | -------------------------------- | ----------------------- |
+| postgres       | Superadmin système               | Urgence uniquement      |
+| grafana_reader | lcture de la table grafanareader | tableau de bord grafana |
+| dbt_admin      | admin + Lecture/écriture         | Admin + Pipeline dbt    |
 
 ## Documentation interactive
 
