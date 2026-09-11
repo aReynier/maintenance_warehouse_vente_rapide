@@ -35,3 +35,6 @@ flags:
 models:
   datawarehouse_e6:
     # Config indicated by + and applies to all files under models/example/
+
+on-run-end:
+  - "{{ dbt_artifacts.upload_results(results) }}"
