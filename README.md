@@ -144,13 +144,50 @@ datawarehouse_e6:
 dbt debug
 ```
 
-### 7. Lancer l'entrepôt
+### 7. Mettre en place le tableau de bord grafana
+
+Ajouter l'utilisateur dédié à Grafana:
 
 ```bash
-dbt seed        # charge les 5 tables brutes
-dbt run         # construit les 12 modèles
-dbt snapshot    # initialise le SCD type 2
-dbt test        # lance les 66 tests
+sudo -u postgres psql -d "${POSTGRES_DB}" -c "
+CREATE USER ${GRAFANA_USER} WITH PASSWORD '${GRAFANA_USER_PASSWORD}';
+GRANT CONNECT ON DATABASE ${POSTGRES_DB} TO ${GRAFANA_USER};
+GRANT USAGE ON SCHEMA public TO ${GRAFANA_USER};
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO ${GRAFANA_USER};
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO ${GRAFANA_USER};
+"
+```
+
+Lancer de docker compose du monitoring:
+
+```bash
+docker compose -f docker-compose.monitoring.yml up -d
+```
+
+Aller sur l'inteface de Grafana à l'adresse: [http://localhost:3000](http://localhost:3000/)
+
+Entrer les identifiants de Grafana fournis dans le .env GRAFANA_USER et GRAFANA_USER_PASSWORD
+
+Dans l'interface de Grafana, ajouter la connexion de spogres avec les identifiants et le nom de la base de données:
+![Connexion Grafana Postgres 1](./assets/docs/grafana_postgres_1.png)
+![Connexion Grafana Postgres 2](./assets/docs/grafana_postgres_2.png)
+![Connexion Grafana Postgres 3](./assets/docs/grafana_postgres_3.png)
+![Connexion Grafana Postgres 4](./assets/docs/grafana_postgres_4.png)
+
+Si la connexion postgres à Grafana bloque, employer
+[Dépannage](./docs/depannage.md)
+
+### 7. Lancer l'entrepôt
+
+Avant la première exécution, il est nécessaire d'installer les dépendances (notamment le package de monitoring) et d'initialiser ses tables système.
+
+```bash
+dbt deps                            # Installe les packages (dbt_artifacts)
+dbt run --select dbt_artifacts      # Crée les tables de logs dbt dans PostgreSQL
+dbt seed                            # charge les 5 tables brutes
+dbt run                             # construit les 12 modèles
+dbt snapshot                        # initialise le SCD type 2
+dbt test                            # lance les 66 tests
 ```
 
 ### 8. Développement quotidien
@@ -193,10 +230,11 @@ README.md
 
 ## Utilisateurs PostgreSQL
 
-| Utilisateur | Droits                   | Usage                |
-| ----------- | ------------------------ | -------------------- |
-| postgres    | Superadmin système       | Urgence uniquement   |
-| dbt_admin   | admin + Lecture/écriture | Admin + Pipeline dbt |
+| Utilisateur    | Droits                           | Usage                   |
+| -------------- | -------------------------------- | ----------------------- |
+| postgres       | Superadmin système               | Urgence uniquement      |
+| grafana_reader | lcture de la table grafanareader | tableau de bord grafana |
+| dbt_admin      | admin + Lecture/écriture         | Admin + Pipeline dbt    |
 
 ## Documentation interactive
 
@@ -215,3 +253,8 @@ Vous y trouverez :
 
 - La procédure de restauration pour un backup complet (DRP)
 - La procédure de sauvegarde et restauration partielle (schéma / table)
+
+## Dépannage
+
+A tout moment, si vous êtes bloqué, cette partie de la documentation vous aidera peut être à vous débloquer:
+[Dépannage](./docs/depannage.md)
