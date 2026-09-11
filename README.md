@@ -179,11 +179,15 @@ Si la connexion postgres à Grafana bloque, employer
 
 ### 7. Lancer l'entrepôt
 
+Avant la première exécution, il est nécessaire d'installer les dépendances (notamment le package de monitoring) et d'initialiser ses tables système.
+
 ```bash
-dbt seed        # charge les 5 tables brutes
-dbt run         # construit les 12 modèles
-dbt snapshot    # initialise le SCD type 2
-dbt test        # lance les 66 tests
+dbt deps                            # Installe les packages (dbt_artifacts)
+dbt run --select dbt_artifacts      # Crée les tables de logs dbt dans PostgreSQL
+dbt seed                            # charge les 5 tables brutes
+dbt run                             # construit les 12 modèles
+dbt snapshot                        # initialise le SCD type 2
+dbt test                            # lance les 66 tests
 ```
 
 ### 8. Développement quotidien
