@@ -270,6 +270,10 @@ README.md
 | reporting_user | Lecture seule sur les tables      | lecture seule pour les reporting (BI & analyst) |
 |                |                                   |                                                 |
 
+## Conformité RGPD
+
+Sé référer à la partie de documentation ci-dessous: [conformité RGPD](./docs/conformite_rgpd.md)
+
 ## Documentation interactive
 
 ```bash
