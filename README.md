@@ -191,6 +191,24 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO ${REPORTING_
 "
 ```
 
+Pour tester que cet utilisateur n'a pas de droits autres que la lecture seule, se connecter avec cet utilisateur:
+
+```
+psql -U ${REPORTING_USER} -d ${POSTGRES_DB} -h localhost -W
+```
+
+puis tester l'impossibilité de créer, modifier ou supprimer une table:
+
+```
+CREATE TABLE public.test_securite (id INT);
+```
+
+A l'inverse, tester la possibilité de consultation en lecture seule d'une table:
+
+```
+SELECT * FROM public.dim_client LIMIT 5;
+```
+
 ### 9. Lancer l'entrepôt
 
 Avant la première exécution, il est nécessaire d'installer les dépendances (notamment le package de monitoring) et d'initialiser ses tables système.
