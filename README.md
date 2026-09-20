@@ -177,7 +177,21 @@ Dans l'interface de Grafana, ajouter la connexion de spogres avec les identifian
 Si la connexion postgres à Grafana bloque, employer
 [Dépannage](./docs/depannage.md)
 
-### 7. Lancer l'entrepôt
+### 8. Création de l'utilisateur reporting
+
+Ajout de l'utilisateur reporting:
+
+```bash
+sudo -u postgres psql -d "${POSTGRES_DB}" -c "
+CREATE USER ${REPORTING_USER} WITH PASSWORD '${REPORTING_USER_PASSWORD}';
+GRANT CONNECT ON DATABASE ${POSTGRES_DB} TO ${REPORTING_USER};
+GRANT USAGE ON SCHEMA public TO ${REPORTING_USER};
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO ${REPORTING_USER};
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO ${REPORTING_USER};
+"
+```
+
+### 9. Lancer l'entrepôt
 
 Avant la première exécution, il est nécessaire d'installer les dépendances (notamment le package de monitoring) et d'initialiser ses tables système.
 
@@ -190,7 +204,7 @@ dbt snapshot                        # initialise le SCD type 2
 dbt test                            # lance les 66 tests
 ```
 
-### 8. Développement quotidien
+### 10. Développement quotidien
 
 Une fois l'initialisation faite, plus besoin de lancer toutes les commandes ci dessous, seul un simple run suffit:
 
@@ -230,11 +244,13 @@ README.md
 
 ## Utilisateurs PostgreSQL
 
-| Utilisateur    | Droits                           | Usage                   |
-| -------------- | -------------------------------- | ----------------------- |
-| postgres       | Superadmin système               | Urgence uniquement      |
-| grafana_reader | lcture de la table grafanareader | tableau de bord grafana |
-| dbt_admin      | admin + Lecture/écriture         | Admin + Pipeline dbt    |
+| Utilisateur    | Droits                            | Usage                                           |
+| -------------- | --------------------------------- | ----------------------------------------------- |
+| postgres       | Superadmin système                | Urgence uniquement                              |
+| grafana_reader | lecture de la table grafanareader | tableau de bord grafana                         |
+| dbt_admin      | admin + Lecture/écriture          | Admin + Pipeline dbt                            |
+| reporting_user | Lecture seule sur les tables      | lecture seule pour les reporting (BI & analyst) |
+|                |                                   |                                                 |
 
 ## Documentation interactive
 
