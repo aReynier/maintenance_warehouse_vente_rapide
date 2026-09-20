@@ -49,3 +49,36 @@ Ce registre est découpé par type de traitement
 | **TRT-02** | **Analyse des Ventes & Comportement Client** | Pilotage de la performance commerciale, suivi du CA et segmentation client. | Identifiant client haché, Historique d'achats | **Intérêt légitime** (Art. 6.1.f) | 5 ans (prescription commerciale) | `reporting_user`, Équipe BI & Analysts (Schéma `marts`) |
 | **TRT-03** | **Gestion & Analyse des Retours Produits** | Suivi du taux de retour (`raw_retours.csv`), identification des défauts et amélioration de la qualité service. | N° de commande, Motifs de retour, Identifiant client pseudonymisé | **Exécution du contrat** | 3 ans à compter de la clôture de la réclamation | `reporting_user`, Responsables Qualité / SAV (Schéma `marts`) |
 | **TRT-04** | **Supervision de l'Infrastructure Data** | Monitoring de la qualité de service (SLA/SLO), suivi des exécutions dbt et disponibilité de la base. | Métriques techniques, journaux de logs, aucune PII métier | **Intérêt légitime** | 1 an (logs système) | `grafana_reader`, Équipe DevOps / Infra |
+
+## Procédure de tri/purge des données personnelles
+
+Conformément au RGPD (Principe de limitation de la conservation), les données à caractère personnel ne doivent pas être conservées sous une forme permettant l'identification des personnes concernées au-delà de la durée nécessaire aux finalités pour lesquelles elles sont traitées.
+
+Cette procédure définit les règles d'identification, d'anonymisation et de purge des comptes clients inactifs au sein du Data Warehouse PostgreSQL.
+
+### Critères d'Inactivité et Règles de Rétention
+
+Un compte client est considéré comme **inactif** s'il remplit les conditions cumulatives suivantes :
+
+- **Statut de l'utilisateur :** `actif = f` (ou absence d'activité/achat enregistrée).
+- **Ancienneté / Inactivité :** La date de la dernière activité (ou à défaut la `date_inscription`) est supérieure ou égale à **36 mois (3 ans)**.
+
+#### Modalités de Traitement selon la Couche de Données :
+
+| Couche Data Warehouse   | Type de Traitement                 | Action Effectuée                                                                                                                                       | Fréquence & Mode d'Exécution                                 |
+| :---------------------- | :--------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------- |
+| **`raw` / `staging`**   | **Purge / Suppression définitive** | Suppression des lignes clients inactifs (`DELETE`) dans les tables brutes de transit.                                                                  | Mensuelle / Automatisée (Script SQL / Job CRON)              |
+| **`marts` (Analytics)** | **Anonymisation Irréversible**     | Hachage permanent de l'email, suppression des données personnelles secondaires (adresse, ville, CP), conservation uniquement des métriques néessaires. | Exécution du pipeline dbt (`dbt run`) après purge du staging |
+
+### Automatisation et Contrôle
+
+Mode d'exécution : Automatisé via une tâche planifiée (Job CRON ou DAG Orchestrateur) exécutée le 1er de chaque mois à 02h00 UTC.
+
+Supervision & Alerting :
+
+- Chaque exécution de la procédure insère une trace dans les logs (date d'exécution, nombre de comptes purges, statut).
+- En cas d'échec de la procédure, une alerte est transmise à l'équipe Data Engineer (email ou tableau de bord Grafana, à mettre en place).
+
+Révisions et Audit :
+
+- La présente procédure fait l'objet d'un réexamen annuel par le Data Controller / DPO pour s'assurer de son adéquation avec l'évolution des réglementations.
