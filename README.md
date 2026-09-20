@@ -270,6 +270,8 @@ README.md
 | reporting_user | Lecture seule sur les tables      | lecture seule pour les reporting (BI & analyst) |
 |                |                                   |                                                 |
 
+En cas de besoin d'ajout d'un nouveau type d'utilisateur, suivre cette procédure: [Procédure d'ajotu d'accès](./docs/procedure_ajout_acces.md)
+
 ## Conformité RGPD
 
 Sé référer à la partie de documentation ci-dessous: [conformité RGPD](./docs/conformite_rgpd.md)
