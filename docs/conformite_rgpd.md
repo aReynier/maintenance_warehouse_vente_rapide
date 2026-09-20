@@ -36,3 +36,16 @@ Dans le respect du RGPD, les équipes de reporting et d'analyse n'ont aucun acc�
 Afin de garantir la traçabilité des traitements et de répondre aux exigences de contrôle (ex: audit CNIL ou gestion des incidents de sécurité), l'ensemble des connexions et des requêtes exécutées sur PostgreSQL est consigné dans les logs du SGBD. Ces données de journalisation permettent de vérifier régulièrement la conformité des accès et de corriger d'éventuelles déviances.
 
 Les demandes de droit d'accès, modificationn d'opposition ou de suppression transmises au DPO sont traitées au niveau des systèmes sources avant répercussion dans la couche `raw` et ré-exécution des pipelines dbt.
+
+## Registre de traitement des données personnelles
+
+- Responsable du traitement: équipe data
+- Délégué à la protection des données (DPO): dpo@entreprise.fr
+
+Ce registre est découpé par type de traitement
+| ID | Nom du Traitement | Finalité | Données personnelles Concernées | Base Légale | Durée de Conservation | Destinataires / Accès |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **TRT-01** | **Ingestion & Staging Data Warehouse** | Centralisation des données opérationnelles brutes pour la préparation des flux analytiques. | Nom, Prénom, Nom complet, Email, Date de naissance, âge, Adresse(ville, code postal, pays), segment, date d'inscription, status actif | **Exécution du contrat** | Durée de la relation contractuelle + 3 ans | `dbt_admin`, Data Engineers (Schémas `raw` & `staging`) |
+| **TRT-02** | **Analyse des Ventes & Comportement Client** | Pilotage de la performance commerciale, suivi du CA et segmentation client. | Identifiant client haché, Historique d'achats | **Intérêt légitime** (Art. 6.1.f) | 5 ans (prescription commerciale) | `reporting_user`, Équipe BI & Analysts (Schéma `marts`) |
+| **TRT-03** | **Gestion & Analyse des Retours Produits** | Suivi du taux de retour (`raw_retours.csv`), identification des défauts et amélioration de la qualité service. | N° de commande, Motifs de retour, Identifiant client pseudonymisé | **Exécution du contrat** | 3 ans à compter de la clôture de la réclamation | `reporting_user`, Responsables Qualité / SAV (Schéma `marts`) |
+| **TRT-04** | **Supervision de l'Infrastructure Data** | Monitoring de la qualité de service (SLA/SLO), suivi des exécutions dbt et disponibilité de la base. | Métriques techniques, journaux de logs, aucune PII métier | **Intérêt légitime** | 1 an (logs système) | `grafana_reader`, Équipe DevOps / Infra |
