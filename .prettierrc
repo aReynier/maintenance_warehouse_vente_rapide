@@ -1,0 +1,9 @@
+{
+  "singleQuote": true,
+  "yaml": {
+    "singleQuote": true
+  },
+  "[yaml]": {
+    "editor.formatOnSave": false
+  }
+}
