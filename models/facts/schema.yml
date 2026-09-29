@@ -98,3 +98,38 @@ models:
         description: "True si la visite a abouti à une commande"
       - name: device
         description: "Type d'appareil utilisé : desktop, mobile, tablet"
+
+  - name: fact_retours
+    description: "Table de faits enregistrant les événements de retours produits et leurs montants remboursés."
+    columns:
+      - name: retour_id
+        description: "Identifiant unique du retour"
+        tests:
+          - unique
+          - not_null
+      - name: commande_id
+        description: "Identifiant de la commande"
+        tests:
+          - not_null
+      - name: produit_id
+        description: "Identifiant du produit"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_produit')
+                field: produit_id
+      - name: client_id
+        description: "Identifiant du client"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_client')
+                field: client_id
+      - name: date_retour_id
+        description: "Clé étrangère de date au format YYYYMMDD"
+      - name: motif
+        description: "Motif du retour"
+      - name: montant_rembourse
+        description: "Montant remboursé suite au retour"
