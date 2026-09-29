@@ -1,9 +1,11 @@
 {
-  "singleQuote": true,
-  "yaml": {
-    "singleQuote": true
-  },
-  "[yaml]": {
-    "editor.formatOnSave": false
-  }
+  "singleQuote": false,
+  "overrides": [
+    {
+      "files": ["*.yml", "*.yaml"],
+      "options": {
+        "singleQuote": false
+      }
+    }
+  ]
 }
