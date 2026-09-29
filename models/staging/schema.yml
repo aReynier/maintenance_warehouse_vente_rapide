@@ -20,7 +20,7 @@ models:
           - not_null
           - accepted_values:
               arguments:
-                values: ['Premium', 'Standard']
+                values: ["Premium", "Standard"]
 
   - name: stg_produits
     description: "Données produits nettoyées et typées"
@@ -51,13 +51,13 @@ models:
           - not_null
           - accepted_values:
               arguments:
-                values: ['Livré', 'Annulé', 'Retourné', 'En cours']
+                values: ["Livré", "Annulé", "Retourné", "En cours"]
       - name: canal
         tests:
           - not_null
           - accepted_values:
               arguments:
-                values: ['SEO', 'Email', 'Pub', 'Direct']
+                values: ["SEO", "Email", "Pub", "Direct"]
 
   - name: stg_lignes_commande
     description: "Lignes de commande nettoyées et typées"
@@ -91,4 +91,29 @@ models:
           - not_null
           - accepted_values:
               arguments:
-                values: ['SEO', 'Email', 'Pub', 'Direct']
+                values: ["SEO", "Email", "Pub", "Direct"]
+
+  - name: stg_retours
+    description: "Données des retours produits nettoyées et typées"
+    columns:
+      - name: retour_id
+        tests:
+          - unique
+          - not_null
+      - name: commande_id
+        tests:
+          - not_null
+      - name: produit_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: motif
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - Défaut
+                  - Erreur
+                  - Changement d''avis
