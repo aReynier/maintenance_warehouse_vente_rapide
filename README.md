@@ -24,6 +24,11 @@ Cet entrepôt centralise les données de commandes, produits, clients, visites e
   `pg_isready`
 - dbt installé : `pip install dbt-postgres`
 
+## Architecture du projet
+
+L'architecture du projet est consultable dans la partie suivante du projet:
+[Architecture du projet](./docs/architecture.md)
+
 ## Installation
 
 ### 1. Récupérer le projet
